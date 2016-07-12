@@ -1,6 +1,6 @@
 {
   "name": "candy.scss",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Sass utility to create gradient effects across elements in CSS.",
   "main": "candy.scss",
   "scripts": {
