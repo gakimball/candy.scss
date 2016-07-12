@@ -1,0 +1,75 @@
+/// Finds the color at `$position` between two colors. The position should be a number between 0 and 1, where 0 is `$color1` and 1 is `$color2`.
+/// @access private
+/// @param {Color} $color1 - Starting color.
+/// @param {Color} $color2 - Ending color.
+/// @param {Color} $position - Position along the gradient to use.
+/// @returns {Color} The color between the two input colors, at the specified position.
+@function -candy-get-color($color1, $color2, $position) {
+  $red: red($color1) * $position + red($color2) * (1 - $position);
+  $blue: blue($color1) * $position + blue($color2) * (1 - $position);
+  $green: green($color1) * $position + green($color2) * (1 - $position);
+
+  @return rgb($red, $blue, $green);
+}
+
+/// Get a list of `$n` colors that form a gradient between, and including, `$color1` and `$color2`.
+/// @param {Color} $color1 - Starting color.
+/// @param {Color} $color2 - Ending color.
+/// @param {Number} $n - Number of colors to get.
+/// @returns {List} List of colors along the gradient.
+@function candy($color1, $color2, $n) {
+  // Final output list
+  $list: ();
+
+  @for $i from 1 through $n {
+    // Value to append to `$list`
+    $value: null;
+
+    // If $i == 1 (first iteration), then we want the starting color in the gradient
+    @if $i == 1 {
+      $value: $color1;
+    }
+    // If $i == $n (last iteration), then we want the ending color in the gradient
+    @else if $i == $n {
+      $value: $color2;
+    }
+    // Otherwise, we want a color somewhere in the middle
+    @else {
+      $pos: (1 / ($n - 1)) * ($i - 1); // Position along the gradient to extract
+      $value: -candy-get-color($color1, $color2, $pos);
+    }
+
+    $list: append($list, $value, comma);
+  }
+
+  @return $list;
+}
+
+/// Internal variable that stores the current color when looping through the `candy()` mixin. It's like a ghetto callback.
+/// @type Color
+/// @private
+$-candy-color: black;
+
+/// Print a block of CSS `$n` times, wrapping the content in an `nth-child()` selector. Each `nth-child()` selector gets a different color along the gradient between `$color1` and `$color2`.
+/// @param {Color} $color1 - Starting color.
+/// @param {Color} $color2 - Ending color.
+/// @param {Number} $n - Number of colors to get.
+@mixin candy($color1, $color2, $n) {
+  $colors: candy($color1, $color2, $n);
+
+  @each $color in $colors {
+    $i: index($colors, $color);
+    $-candy-color: $color !global;
+
+    &:nth-child(#{$i}) {
+      @content;
+    }
+  }
+}
+
+/// Get the current color within an `candy()` mixin. The color can be lightened or darkened on the fly by passing a percentage value to the function. A positive value will lighten the color, while a negative value will darken it.
+/// @param {Percentage} $adjust [0%] - Amount to lighten or darken the color.
+/// @returns {Color} The current color in the gradient.
+@function candy-color($adjust: 0%) {
+  @return adjust-color($-candy-color, $lightness: $adjust);
+}
