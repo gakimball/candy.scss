@@ -14,7 +14,7 @@ candy.css streamlines this down to one chunk of CSS. You tell the mixin what the
 
 ```scss
 .box {
-  @include candy(red, purple) {
+  @include candy(red, purple, 5) {
     color: candy-color();
   }
 }
