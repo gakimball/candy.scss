@@ -1,0 +1,28 @@
+@import 'true';
+@import '../node_modules/ocha/src/ocha';
+@import '../candy';
+
+@include test-module('-candy-get-color [Function]') {
+  @include test('finds a color at a specific point between two colors') {
+    $color: -candy-get-color(white, black, 0.5);
+    @include assert-equal($color, gray, 'Hay');
+  }
+}
+
+@include test-module('candy [Function]') {
+  @include test('correctly returns the start and end color if the gradient length is two') {
+    $list: candy(white, black, 2);
+    $expected: (white, black);
+    @include assert-equal($list, $expected, 'Hay');
+  }
+
+  @include test('generates a gradient of colors between and including the start and end color') {
+    $list: candy(white, black, 3);
+    $expected: (white, gray, black);
+    @include assert-equal($list, $expected, 'Hay');
+  }
+}
+
+// @include test-module('candy-color [Function]') {
+//   @include test('returns ')
+// }
